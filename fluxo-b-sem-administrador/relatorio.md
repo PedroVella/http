@@ -10,18 +10,18 @@
 
 ## Identificação
 
-| Campo       | Valor                  |
-|-------------|------------------------|
-| Nome        | [seu nome completo]    |
-| RA          | [seu RA]               |
-| Disciplina  | Redes de Computadores  |
-| Turma       | [sua turma]            |
-| Data        | [data da realização]   |
-| Fluxo       | **B — Aluno sem privilégio de administrador** |
-| SO utilizado | [Windows 11 / Ubuntu 22.04 / macOS ...] |
-| Ferramenta de proxy | [Fiddler Classic per-user / mitmproxy / HTTP Toolkit / ...] |
-| Navegador(es)       | [Chrome 124 / Firefox 125 / ...] |
-| HTTPS-First Mode / HTTPS-Only desabilitado? | [sim / não] |
+| Campo                                       | Valor                                         |
+|---------------------------------------------|-----------------------------------------------|
+| Nome                                        | [seu nome completo]                           |
+| RA                                          | [seu RA]                                      |
+| Disciplina                                  | Redes de Computadores                         |
+| Turma                                       | [sua turma]                                   |
+| Data                                        | [data da realização]                          |
+| Fluxo                                       | **B — Aluno sem privilégio de administrador** |
+| SO utilizado                                | [Windows 10/11]                               |
+| Ferramenta de proxy                         | Fiddler Classic per-user                      |
+| Navegador(es)                               | [Chrome 124 / Firefox 125 / ...]              |
+| HTTPS-First Mode / HTTPS-Only desabilitado? | [sim / não]                                   |
 
 ---
 
@@ -318,7 +318,7 @@ Cabeçalhos:
 
 ## Atividade 8 — Manipulação com breakpoints
 
-> **Atividade exclusiva do Fiddler Classic.** Se você utilizou mitmproxy ou HTTP Toolkit, responda às questões 8.1 e 8.2 de forma teórica (sem capturas de tela), indicando que a ferramenta utilizada não suporta breakpoints interativos.
+> Esta atividade usa os breakpoints interativos do Fiddler Classic.
 
 **Captura de tela da edição do User-Agent:** `evidencias/atv8_ua_edit.png`
 
@@ -394,7 +394,7 @@ Location: [colar aqui]
 
 [resposta]
 
-### 10. Se fosse automatizar a inspeção via script, qual ferramenta alternativa escolheria? Por quê?
+### 10. Se fosse automatizar parte da inspeção mantendo o Fiddler como proxy, que abordagem usaria? Por quê?
 
 [resposta]
 
@@ -427,7 +427,7 @@ Location: [colar aqui]
 [redigir, em até 5 linhas, com base na seção 4.6 do readme.md]
 
 - [ ] HTTPS-First Mode / HTTPS-Only Mode reabilitado no navegador
-- [ ] Fiddler / mitmproxy / HTTP Toolkit fechado (porta de proxy liberada)
+- [ ] Fiddler fechado (porta de proxy liberada)
 - [ ] Configuração de proxy removida do navegador (se aplicável)
 
 ---
