@@ -4,7 +4,7 @@
 >
 > **Escopo:** executa a atividade **na íntegra**, incluindo captura e inspeção de tráfego **HTTP e HTTPS** (com decriptação TLS via certificado raiz do Fiddler).
 >
-> **Fundamentação teórica:** a teoria (estrutura de mensagens, métodos, status codes, cabeçalhos, papel do proxy) está no arquivo [`readme.md`](../readme.md) na raiz do repositório. Este roteiro é auto-contido nos aspectos práticos.
+> **Fundamentação teórica:** a teoria (estrutura de mensagens, métodos, status codes, cabeçalhos, papel do proxy e decriptação TLS) está no arquivo [`readme.md`](../readme.md) na raiz do repositório. Este roteiro é auto-contido nos aspectos práticos.
 
 ---
 
@@ -16,18 +16,18 @@
   - [2.2. Ativação da decriptação HTTPS](#22-ativação-da-decriptação-https)
   - [2.3. Validação do ambiente](#23-validação-do-ambiente)
 - [3. Atividades Práticas](#3-atividades-práticas)
-- [4. Questões de Verificação](#4-questões-de-verificação)
-- [5. Entrega](#5-entrega)
-- [6. Encerramento obrigatório](#6-encerramento-obrigatório)
+- [4. Entrega](#4-entrega)
+- [5. Encerramento obrigatório](#5-encerramento-obrigatório)
 
 ---
 
 ## 1. Validação do privilégio administrativo
 
-Antes de iniciar, confirme que este é o fluxo correto. Abra um prompt do PowerShell e execute:
+Antes de iniciar, confirme que este é o fluxo correto. Abra um prompt do PowerShell e execute as duas linhas abaixo (cole linha por linha):
 
 ```powershell
-(New-Object System.Security.Principal.WindowsPrincipal([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
+$id = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+(New-Object System.Security.Principal.WindowsPrincipal($id)).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 ```
 
 - Retornou `True` **ou** você consegue executar o Fiddler "Como administrador" sem que o UAC exija senha de outra conta → **prossiga com este roteiro**.
@@ -55,16 +55,12 @@ Antes de iniciar, confirme que este é o fluxo correto. Abra um prompt do PowerS
 - **Painel da direita:** abas `Inspectors`, `AutoResponder`, `Composer`, `Filters`.
 - Dentro de **Inspectors**, abas horizontais separam **Request** (cima) e **Response** (baixo) com visualizações `Raw`, `Headers`, `WebForms`, `JSON`, `Cookies`, `TextView`.
 
-**Alternativas cross-platform** (caso prefira Linux/macOS):
+**Configuração do navegador para captura.**
 
-| Ferramenta        | SO                  | Observação                                          |
-|-------------------|---------------------|-----------------------------------------------------|
-| **Fiddler Everywhere** | Win/Mac/Linux  | Interface moderna; requer conta (tier gratuito limitado) |
-| **mitmproxy**     | Win/Mac/Linux       | CLI/TUI; excelente para scripting em Python         |
-| **HTTP Toolkit**  | Win/Mac/Linux       | GUI moderna, configuração assistida do navegador    |
-| **Burp Suite Community** | Win/Mac/Linux | Foco em segurança                                 |
+- **Chrome ou Edge** (recomendado): nada a fazer — o Fiddler ajusta automaticamente o proxy do sistema (WinINET) e o tráfego destes navegadores passa pelo Fiddler.
+- **Firefox**: vá em `about:preferences` → role até **Configurações de rede** → **Configurar...** → marque **Usar as configurações de proxy do sistema**. Para HTTPS decifrado, também será necessário importar o certificado do Fiddler na etapa 2.2.
 
-Os termos abaixo usam o **Fiddler Classic**, mas os conceitos se aplicam a todas.
+> 💡 **Idioma da interface.** O Fiddler Classic existe somente em inglês. Todos os menus, abas e botões mencionados neste roteiro estão em inglês exatamente como aparecem na tela.
 
 ### 2.2. Ativação da decriptação HTTPS
 
@@ -77,6 +73,13 @@ Por padrão, o Fiddler mostra para HTTPS apenas um túnel `CONNECT` opaco. Para 
 3. Aceitar a instalação do certificado raiz (`DO_NOT_TRUST_FiddlerRoot`) quando solicitado. Confirmar na caixa de diálogo do Windows (clicar **Sim** no prompt de confiança).
 4. **Firefox** (se usar): o Firefox tem armazenamento de certificados próprio. Exportar o certificado em *Actions → Export Root Certificate to Desktop* e importá-lo em `about:preferences#privacy → Ver Certificados → Importar → FiddlerRoot.cer`, marcando "Confiar nesta CA para identificar sites".
 
+**Checklist antes de prosseguir:**
+
+- [ ] **Tools → Options → HTTPS:** opções *Capture HTTPS CONNECTs* e *Decrypt HTTPS traffic* marcadas.
+- [ ] Certificado raiz `DO_NOT_TRUST_FiddlerRoot` instalado no Windows e, se aplicável, no Firefox.
+- [ ] Canto inferior esquerdo do Fiddler exibe **"Capturing"** (caso contrário, tecle **F12** ou clique no campo).
+- [ ] Navegador escolhido configurado conforme descrito acima.
+
 ### 2.3. Validação do ambiente
 
 Acesse `https://httpbin.org/get` no navegador. No Fiddler, a sessão deve aparecer com:
@@ -86,7 +89,7 @@ Acesse `https://httpbin.org/get` no navegador. No Fiddler, a sessão deve aparec
 
 Se o Fiddler ainda mostrar apenas `CONNECT` com conteúdo cifrado, repita a etapa 2.2 e confirme a instalação do certificado.
 
-> ⚠️ **Aviso ético.** O certificado raiz do Fiddler permite a decriptografia de **qualquer** conexão HTTPS feita por esta máquina enquanto estiver instalado. **Não esqueça de removê-lo** ao final do laboratório (seção 6).
+> ⚠️ **Aviso ético.** O certificado raiz do Fiddler permite a decriptografia de **qualquer** conexão HTTPS feita por esta máquina enquanto estiver instalado. **Não esqueça de removê-lo** ao final do laboratório (seção 5).
 
 ---
 
@@ -96,6 +99,32 @@ Se o Fiddler ainda mostrar apenas `CONNECT` com conteúdo cifrado, repita a etap
 > - Captura de tela da sessão no Fiddler.
 > - Trecho da mensagem *raw* (request ou response) conforme solicitado.
 > - Respostas às questões embutidas.
+
+### Antes de começar
+
+1. **Crie a pasta `evidencias/`** ao lado do `relatorio.md`. Todas as capturas de tela ficarão lá.
+2. Use a tabela abaixo para nomear os arquivos de captura **exatamente** como indicado:
+
+   | Atividade | Arquivo(s) esperado(s) em `evidencias/`             |
+   |-----------|-----------------------------------------------------|
+   | 1         | `atv1_sessao.png`                                   |
+   | 2         | `atv2_raw.png`                                      |
+   | 3         | `atv3_post_raw.png`, `atv3_composer.png`            |
+   | 4         | `atv4_lista.png`                                    |
+   | 5         | `atv5_headers.png`                                  |
+   | 6         | `atv6_http.png`, `atv6_https_sem.png`, `atv6_https_com.png` |
+   | 7         | `atv7_cookies.png`                                  |
+   | 8         | `atv8_ua_edit.png`, `atv8_status_edit.png`          |
+   | Encerramento | `encerramento_certmgr.png`                       |
+
+3. **Limpe a lista de sessões do Fiddler** entre uma atividade e outra com **Edit → Remove → All Sessions** (atalho `Ctrl+X`). Isso evita confusão na hora de localizar a sessão alvo.
+
+### Glossário rápido
+
+- **Request-line:** primeira linha do pedido enviado pelo cliente, no formato `MÉTODO request-target VERSÃO` (ex.: `GET /index.html HTTP/1.1`).
+- **Status-line:** primeira linha da resposta do servidor, no formato `VERSÃO CÓDIGO RAZÃO` (ex.: `HTTP/1.1 200 OK`).
+- **Raw:** visualização que mostra a mensagem HTTP exatamente como trafegou nos bytes do socket TCP — é a fonte de verdade quando outras visualizações (Headers, JSON, WebForms) parecem divergir.
+- **Body:** o corpo da mensagem, separado dos cabeçalhos por uma linha em branco.
 
 ### Atividade 1 — Primeira captura
 
@@ -120,7 +149,7 @@ Se o Fiddler ainda mostrar apenas `CONNECT` com conteúdo cifrado, repita a etap
 
 **Objetivo:** dissecar uma requisição GET com *query string* e correlacioná-la à resposta.
 
-1. Acessar no navegador: `https://httpbin.org/get?aluno=SEU_NOME&curso=redes`.
+1. Acessar no navegador: `https://httpbin.org/get?aluno=SEU_NOME&curso=redes` — **substituindo `SEU_NOME` pelo seu próprio nome** (sem espaços; use underline se necessário, ex: `joao_silva`). Isso identifica sua captura no relatório.
 2. Localizar a sessão no Fiddler.
 3. Inspecionar em **Request → Raw** e **Response → JSON**.
 
@@ -131,7 +160,7 @@ Se o Fiddler ainda mostrar apenas `CONNECT` com conteúdo cifrado, repita a etap
 
 **Pergunta 2.1:** O valor do campo `origin` no JSON retornado corresponde a qual elemento da rede? Por que não é o IP local da sua máquina (em muitos casos)?
 
-**Pergunta 2.2:** Compare o cabeçalho `User-Agent` enviado pelo navegador com o que aparece no JSON da resposta. Eles coincidem? Justifique.
+**Pergunta 2.2:** Compare o cabeçalho `User-Agent` enviado pelo navegador com o que aparece no JSON da resposta. Eles coincidem? Se **não** coincidirem, qual elemento intermediário (proxy escolar, antivírus, extensão de navegador, o próprio Fiddler) poderia tê-lo modificado?
 
 **Pergunta 2.3:** Modifique a URL para `https://httpbin.org/headers`. Liste até três cabeçalhos que o servidor vê mas que **não aparecem explicitamente** na aba Raw do request, e explique de onde eles vêm (dica: Fiddler pode inserir alguns, o servidor de proxy reverso do httpbin pode inserir outros). Se não encontrar três, registre os que encontrar e explique por que o resultado pode variar.
 
@@ -158,6 +187,17 @@ Se o Fiddler ainda mostrar apenas `CONNECT` com conteúdo cifrado, repita a etap
 
 **Pergunta 3.3:** Usando a aba **Composer** do Fiddler, envie manualmente um `POST` para `https://httpbin.org/post` com `Content-Type: application/json` e o corpo `{"protocolo":"HTTP","versao":"1.1"}`. Registre a *response* completa. Que campo do JSON de resposta confirma que o servidor recebeu e interpretou corretamente o JSON?
 
+> 💡 **Dica de inspeção.** Verifique especificamente o campo `json` da resposta. Se ele estiver `null` e o conteúdo aparecer apenas em `data` como string, isso indica que o `Content-Type` foi enviado errado (ou ficou em branco) — o servidor recebeu os bytes mas não os interpretou como JSON.
+
+> **Como enviar o POST manual no Composer do Fiddler Classic:**
+>
+> 1. Abrir a aba **Composer** (no painel direito).
+> 2. No menu suspenso de método, selecionar **POST**.
+> 3. No campo de URL, digitar `https://httpbin.org/post`.
+> 4. Na **caixa de texto de cabeçalhos** (acima da caixa do body), em uma linha própria, digitar exatamente: `Content-Type: application/json` (já existirão um `User-Agent`/`Host` — não os apague).
+> 5. Na **caixa do Request Body** (abaixo dos cabeçalhos), colar: `{"protocolo":"HTTP","versao":"1.1"}` — sem aspas extras, sem quebras de linha.
+> 6. Clicar em **Execute** (botão à direita).
+
 ---
 
 ### Atividade 4 — Catálogo de status codes
@@ -180,8 +220,8 @@ Para cada URL abaixo, acesse no navegador e localize a sessão no Fiddler:
 | 6 | `https://httpbin.org/status/503`      | 5xx             |
 
 Adicionalmente, para observar um **304 Not Modified** de forma controlada:
-7. Acesse `https://www.example.com`, aguarde carregar e anote o cabeçalho `Last-Modified` da resposta.
-8. No **Composer** do Fiddler (ou ferramenta equivalente), envie um `GET` para `https://www.example.com/` incluindo o cabeçalho `If-Modified-Since` com o valor exato de `Last-Modified` observado no passo anterior.
+7. Acesse `https://httpbin.org/cache` e anote o valor do cabeçalho `Last-Modified` da resposta (visível em **Inspectors → Response → Headers**).
+8. No **Composer** do Fiddler, envie um `GET` para `https://httpbin.org/cache` incluindo o cabeçalho `If-Modified-Since` com o valor exato de `Last-Modified` observado no passo anterior.
 9. Localize a sessão condicional gerada no passo 8 e confirme que a resposta retornou `304 Not Modified`. Use esta sessão condicional como a linha 7 da tabela. Se o servidor retornar `200 OK`, registre os cabeçalhos de cache observados e explique a diferença.
 
 **Registrar no relatório:**
@@ -200,6 +240,8 @@ Adicionalmente, para observar um **304 Not Modified** de forma controlada:
 **Objetivo:** reconhecer o propósito funcional de cada cabeçalho em tráfego real.
 
 1. Em uma janela anônima / privativa, acessar `https://httpbin.org/response-headers?Cache-Control=max-age%3D3600&Set-Cookie=teste%3D1&Strict-Transport-Security=max-age%3D31536000` para provocar cabeçalhos controlados.
+
+   > 💡 A URL acima está percent-encoded. Decodificada, equivale a pedir os parâmetros `Cache-Control=max-age=3600`, `Set-Cookie=teste=1` e `Strict-Transport-Security=max-age=31536000`. Cole-a **exatamente como está** na barra de endereço — copiar a versão decodificada quebra a query string.
 2. Acessar `https://httpbin.org/gzip` para observar uma resposta compactada.
 3. Recarregar a primeira URL uma vez, para verificar se o cookie `teste=1` passa a aparecer no cabeçalho `Cookie` do request.
 4. Selecionar as sessões correspondentes e, na aba **Inspectors → Headers**, analisar request e response.
@@ -281,10 +323,12 @@ Adicionalmente, para observar um **304 Not Modified** de forma controlada:
 
 **Objetivo:** compreender o proxy como agente ativo, capaz de modificar tráfego em trânsito.
 
-1. No Fiddler, habilitar **breakpoint de request**: menu **Rules → Automatic Breakpoints → Before Requests** (atalho **F11**).
+1. No Fiddler, habilitar **breakpoint de request**: menu **Rules → Automatic Breakpoints → Before Requests**.
+
+   > ⚠️ **Atenção ao atalho F11.** Existe um atalho `F11` documentado, **mas só funciona com o foco na janela do Fiddler**. Se você acionar F11 com o foco no navegador, o navegador entra em modo tela cheia. Para evitar confusão, **prefira sempre o caminho de menu** nesta atividade.
 2. No navegador, acessar `https://httpbin.org/user-agent`.
 3. A sessão pausará no Fiddler com um ícone vermelho.
-4. Na aba **Inspectors → Request → Raw**, editar o cabeçalho `User-Agent` para um valor inventado, por exemplo:
+4. Na aba **Inspectors → Request → Raw** (clique dentro da área de texto para habilitar a edição), localizar a linha `User-Agent: ...` e substituir o valor por algo inventado, por exemplo:
    `User-Agent: LaboratorioRedes/1.0 (Aluno NOME)`
 5. Clicar em **Run to Completion** (botão verde no topo do inspector).
 6. Na resposta, observar o JSON retornado.
@@ -295,38 +339,32 @@ Adicionalmente, para observar um **304 Not Modified** de forma controlada:
 
 **Pergunta 8.1:** O servidor tem como detectar que o `User-Agent` foi forjado? Discuta.
 
-**Pergunta 8.2:** Repita o exercício, mas desta vez habilite **breakpoint de response** (**Rules → Automatic Breakpoints → After Responses**). Acesse `https://httpbin.org/status/200` e, quando o Fiddler pausar, edite a *status-line* para `HTTP/1.1 404 Not Found`. Libere. O que o navegador exibe? A manipulação afetou apenas a visualização local — comente sobre o papel do proxy como *man-in-the-middle*.
+**Pergunta 8.2:** Repita o exercício, mas desta vez habilite **breakpoint de response** (**Rules → Automatic Breakpoints → After Responses**). Acesse `https://httpbin.org/status/200` e, quando o Fiddler pausar, vá em **Inspectors → Response → Raw** e edite a primeira linha (a *status-line*) para `HTTP/1.1 404 Not Found`. Clique em **Run to Completion**. Descreva **o que VOCÊ observou** no navegador (o comportamento varia entre Chrome, Edge e Firefox — qualquer descrição honesta da tela renderizada é válida). Comente sobre o papel do proxy como *man-in-the-middle*: o servidor original retornou `200`, mas o navegador acreditou em `404`.
 
 **Pergunta 8.3:** Desabilite todos os breakpoints (**Rules → Automatic Breakpoints → Disabled**, atalho **Shift+F11**) ao terminar.
 
 ---
 
-## 4. Questões de Verificação
-
-Responda no relatório. Respostas concisas, com base no observado, são preferíveis a explicações genéricas.
-
-1. Qual é a **ordem dos elementos** em uma mensagem HTTP/1.1? O que separa os cabeçalhos do corpo?
-2. Por que o cabeçalho `Host` é **obrigatório** em HTTP/1.1 mas era opcional em HTTP/1.0? (Dica: virtual hosting.)
-3. Explique a diferença entre os códigos `401 Unauthorized` e `403 Forbidden`.
-4. Um `POST` enviado duas vezes produz o mesmo efeito que um único envio? E um `PUT`? Justifique em termos de **idempotência**.
-5. Por que HTTPS, mesmo cifrando todo o tráfego de aplicação, ainda permite que um observador saiba **qual site** o usuário está visitando? (Cite SNI e DNS.)
-6. O que `Content-Encoding: gzip` muda no fluxo? Em que ponto os dados são compactados e em que ponto são descompactados?
-7. Um servidor envia `Cache-Control: no-store` em uma resposta. Qual o impacto prático no comportamento do navegador?
-8. Descreva, em até 5 linhas, como o Fiddler consegue decifrar HTTPS sem violar a criptografia — e por que isso só é possível com **cooperação do usuário**.
-9. Dê um exemplo concreto, observado nas atividades, de um cabeçalho de **request** que o navegador envia automaticamente, sem a página pedir.
-10. Se você quisesse automatizar a inspeção (script), qual das ferramentas alternativas da seção 2.1 seria mais adequada? Por quê?
-
----
-
-## 5. Entrega
+## 4. Entrega
 
 ### O que entregar
-- Arquivo **`relatorio.md`** preenchido (template nesta mesma pasta).
-- Pasta **`evidencias/`** com as capturas de tela nomeadas por atividade (`atv1_sessao.png`, `atv3_post_raw.png`, etc.), incluindo obrigatoriamente a captura do `certmgr.msc` após a remoção do certificado (ver seção 6).
-- Arquivo **`httpbin_composer.saz`** (opcional): exportação da sessão do Composer da Atividade 3 via *File → Save → Selected Sessions*.
+- Arquivo **`relatorio.pdf`** gerado a partir do `relatorio.md` preenchido (ver instruções abaixo).
+- Pasta **`evidencias/`** com as capturas de tela nomeadas por atividade (`atv1_sessao.png`, `atv3_post_raw.png`, etc.), incluindo obrigatoriamente a captura do `certmgr.msc` após a remoção do certificado (ver seção 5).
+
+### Como gerar o PDF a partir do `relatorio.md`
+
+O relatório é escrito em Markdown. Use uma das duas opções abaixo:
+
+| Ferramenta | Quando usar | Como usar |
+|---|---|---|
+| **Markdown PDF** — extensão VS Code (**recomendado**) | Você já está com o repositório aberto no VS Code; funciona offline. | Instalar a extensão *"Markdown PDF"* (autor: yzane). Com o `relatorio.md` aberto, pressionar `Ctrl+Shift+P` → *"Markdown PDF: Export (pdf)"*. O arquivo é gerado ao lado do `.md`. |
+| **Markdown to PDF** (md2pdf) — site público gratuito | Fallback se a extensão não puder ser instalada (laboratório com restrição). Não exige cadastro. | Abrir https://md2pdf.netlify.app, arrastar o arquivo `relatorio.md` para a área indicada (ou colar o conteúdo) e clicar em **Convert**. Salvar o PDF gerado. |
+
+> **Dica:** antes de gerar o PDF, revise o preview do Markdown (VS Code: `Ctrl+Shift+V`) para confirmar que tabelas e blocos de código estão formatados corretamente. Imagens referenciadas em `evidencias/` devem estar **na mesma pasta** do `relatorio.md` para aparecerem no PDF.
 
 ### Como entregar
-- Compactar a pasta do aluno em `NOME_RA_LAB_HTTP_FLUXOA.zip`.
+- Compactar a pasta do aluno em `SOBRENOME_NOME_RA_LAB_HTTP_FLUXOA.zip` contendo o `relatorio.pdf` e a pasta `evidencias/`.
+   - Exemplo: `silva_joao_2023123_LAB_HTTP_FLUXOA.zip` (sem espaços, sem acentos, tudo minúsculo).
 - Submeter no **Microsoft Teams**, atividade correspondente, até a data definida em aula.
 
 ### Critérios de avaliação
@@ -340,7 +378,7 @@ Responda no relatório. Respostas concisas, com base no observado, são preferí
 
 ---
 
-## 6. Encerramento obrigatório
+## 5. Encerramento obrigatório
 
 Estes passos são parte da avaliação do Fluxo A. A remoção do certificado raiz é **obrigatória** por ser um risco de segurança mantê-lo instalado.
 

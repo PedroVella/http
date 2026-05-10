@@ -3,22 +3,26 @@
 > **Como usar este template:** substitua os campos `[...]` pelas suas respostas,
 > anexe as capturas de tela na pasta `evidencias/` e referencie-as onde indicado.
 > Preserve a formatação markdown (tabelas, blocos de código) para facilitar a correção.
+>
+> **Observação:** este fluxo inclui inspeção prática de **HTTP em texto claro** e de **HTTPS com decriptação TLS**, usando exclusivamente o Fiddler Classic.
 
 ---
 
 ## Identificação
 
-| Campo       | Valor                  |
-|-------------|------------------------|
-| Nome        | [seu nome completo]    |
-| RA          | [seu RA]               |
-| Disciplina  | Redes de Computadores  |
-| Turma       | [sua turma]            |
-| Data        | [data da realização]   |
-| Fluxo       | **A — Aluno com privilégio de administrador** |
-| SO utilizado | [Windows 11 / Ubuntu 22.04 / macOS ...] |
-| Ferramenta de proxy | [Fiddler Classic / mitmproxy / HTTP Toolkit / ...] |
-| Navegador(es)       | [Chrome 124 / Firefox 125 / ...] |
+| Campo                              | Valor                                      |
+|------------------------------------|--------------------------------------------|
+| Nome                               | [seu nome completo]                        |
+| RA                                 | [seu RA]                                   |
+| Disciplina                         | Redes de Computadores                      |
+| Turma                              | [sua turma]                                |
+| Data                               | [data da realização]                       |
+| Fluxo                              | **A — Aluno com privilégio de administrador** |
+| SO utilizado                       | [Windows 10/11]                            |
+| Ferramenta de proxy                | Fiddler Classic                            |
+| Navegador(es)                      | [Chrome 124 / Firefox 125 / ...]           |
+| Decriptação HTTPS habilitada?      | [sim / não]                                |
+| Certificado Fiddler instalado?     | [sim / não]                                |
 
 ---
 
@@ -177,7 +181,7 @@ Cabeçalhos:
 | 4 | GET    | `https://httpbin.org/status/418` | [...] | [...] | [sim/não] |
 | 5 | GET    | `https://httpbin.org/status/500` | [...] | [...] | [sim/não] |
 | 6 | GET    | `https://httpbin.org/status/503` | [...] | [...] | [sim/não] |
-| 7 | GET    | `https://www.example.com/` com `If-Modified-Since` | [...] | [...] | [sim/não] |
+| 7 | GET    | `https://httpbin.org/cache` com `If-Modified-Since` | [...] | [...] | [sim/não] |
 
 ### Pergunta 4.1
 > Em qual dos status o corpo está ausente/tamanho zero? Isso é obrigatório pela especificação ou depende do servidor?
@@ -279,11 +283,19 @@ Cabeçalhos:
 ### Pergunta 7.2
 > Que atributos o `Set-Cookie` trouxe? Explique cada um presente. Para atributos não observados, registre `não observado`.
 
+> **Nota:** o httpbin define cookies mínimos — normalmente apenas o atributo `Path=/` estará presente. Para cada atributo ausente, registre **não observado** e explique o comportamento padrão do navegador na sua ausência (ex.: sem `Expires`/`Max-Age` → cookie de sessão; sem `Secure` → pode ser enviado por HTTP; sem `SameSite` → o navegador aplica a política padrão da versão em uso).
+
 **Resposta:**
 
-| Atributo | Valor | Função |
-|----------|-------|--------|
-| [...]    | [...] | [...]  |
+| Atributo  | Valor | Função | Observado? |
+|-----------|-------|--------|------------|
+| `Path`    | [...] | [...]  | [...]      |
+| `Domain`  | —     | [...]  | não observado |
+| `Expires` | —     | [...]  | não observado |
+| `Max-Age` | —     | [...]  | não observado |
+| `Secure`  | —     | [...]  | não observado |
+| `HttpOnly`| —     | [...]  | não observado |
+| `SameSite`| —     | [...]  | não observado |
 
 ### Pergunta 7.3
 > O cookie observado trouxe `Secure`? Se não trouxe, em que cenário poderia vazar?
@@ -366,7 +378,7 @@ Cabeçalhos:
 
 [resposta]
 
-### 10. Se fosse automatizar a inspeção via script, qual ferramenta alternativa escolheria? Por quê?
+### 10. Se fosse automatizar parte da inspeção mantendo o Fiddler como proxy, que abordagem usaria? Por quê?
 
 [resposta]
 
@@ -403,5 +415,6 @@ Cabeçalhos:
 - [ ] Pasta `evidencias/` com capturas nomeadas por atividade
 - [ ] 10 questões de verificação respondidas
 - [ ] Evidência de remoção do certificado anexada
-- [ ] Arquivo compactado como `NOME_RA_LAB_HTTP_FLUXOA.zip`
+- [ ] Arquivo `relatorio.pdf` gerado a partir do `relatorio.md`
+- [ ] Arquivo compactado como `SOBRENOME_NOME_RA_LAB_HTTP_FLUXOA.zip`
 - [ ] Submetido no Microsoft Teams dentro do prazo

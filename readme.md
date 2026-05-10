@@ -1,4 +1,4 @@
-# Laboratório: Inspeção de HTTP/HTTPS com *Debugging Proxy*
+# Laboratório: Inspeção de HTTP/HTTPS com Fiddler
 
 > **Disciplina:** Redes de Computadores
 > **Professor:** Claudio Nunes
@@ -19,7 +19,7 @@ Este documento contém a **fundamentação teórica** da atividade e direciona c
   - [4.3. Métodos (verbos) HTTP](#43-métodos-verbos-http)
   - [4.4. Códigos de status](#44-códigos-de-status)
   - [4.5. Principais cabeçalhos](#45-principais-cabeçalhos)
-  - [4.6. O papel do *debugging proxy*](#46-o-papel-do-debugging-proxy)
+  - [4.6. O papel do Fiddler como *debugging proxy*](#46-o-papel-do-fiddler-como-debugging-proxy)
 - [5. Referências](#5-referências)
 - [Anexo A — Tabela-resumo de cabeçalhos](#anexo-a--tabela-resumo-de-cabeçalhos)
 - [Anexo B — Tabela-resumo de status codes](#anexo-b--tabela-resumo-de-status-codes)
@@ -32,7 +32,7 @@ Ao final desta atividade, o aluno será capaz de:
 
 1. **Descrever** a estrutura de uma mensagem HTTP (linha inicial, cabeçalhos, corpo) em nível de bytes.
 2. **Identificar** os métodos, os códigos de status e os principais cabeçalhos de requests/responses reais.
-3. **Utilizar** um *debugging proxy* (Fiddler) para capturar, inspecionar e manipular tráfego HTTP.
+3. **Utilizar** o Fiddler Classic para capturar, inspecionar e manipular tráfego HTTP.
 4. **Diferenciar** o comportamento de HTTP e HTTPS na camada de transporte.
 5. **Analisar** fluxos completos como navegação web, submissão de formulário e manutenção de sessão via cookies.
 
@@ -46,7 +46,7 @@ Ao final desta atividade, o aluno será capaz de:
 - Noções básicas de TLS/SSL.
 
 ### Ambiente técnico
-- Sistema operacional: Windows 10/11 (recomendado para Fiddler Classic) ou Linux/macOS (usar mitmproxy/HTTP Toolkit).
+- Sistema operacional: Windows 10/11.
 - Navegador Chrome, Firefox ou Edge atualizado.
 - Acesso à internet sem bloqueios a sites de teste (`httpbin.org`, `example.com`, `neverssl.com`).
 
@@ -62,12 +62,13 @@ A inspeção de tráfego **HTTPS** pelo Fiddler exige a instalação de um **cer
 
 | Fluxo | Quem usa | Escopo                                     | Pasta |
 |-------|----------|--------------------------------------------|-------|
-| **A** | Alunos **COM** privilégio de administrador | Captura e inspeção de HTTP **e HTTPS** (com decriptação TLS) | [`fluxo-a-administrador/`](fluxo-a-administrador/roteiro.md) |
-| **B** | Alunos **SEM** privilégio de administrador | Captura e inspeção somente de **HTTP em texto claro** + análise teórica de HTTPS | [`fluxo-b-sem-administrador/`](fluxo-b-sem-administrador/roteiro.md) |
+| **A** | Alunos **COM** privilégio de administrador | Captura e inspeção com Fiddler Classic de HTTP **e HTTPS** (com decriptação TLS) | [`fluxo-a-administrador/`](fluxo-a-administrador/roteiro.md) |
+| **B** | Alunos **SEM** privilégio de administrador | Captura e inspeção com Fiddler Classic somente de **HTTP em texto claro** + análise teórica de HTTPS | [`fluxo-b-sem-administrador/`](fluxo-b-sem-administrador/roteiro.md) |
 
 > **Teste rápido para decidir o fluxo.** Abra um prompt do PowerShell e execute:
 > ```powershell
-> (New-Object System.Security.Principal.WindowsPrincipal([System.Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
+> $id = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+> (New-Object System.Security.Principal.WindowsPrincipal($id)).IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
 > ```
 > - Retornou `True` **ou** você consegue executar o Fiddler "Como administrador" sem que o UAC exija senha de outra conta → siga o **[Fluxo A](fluxo-a-administrador/roteiro.md)**.
 > - Retornou `False` **e** o UAC pede credenciais que você não possui → siga o **[Fluxo B](fluxo-b-sem-administrador/roteiro.md)**.
@@ -195,9 +196,9 @@ Agrupados por classe (primeiro dígito):
 | `WWW-Authenticate` | Esquema de autenticação exigido (em 401)                             |
 | `Strict-Transport-Security` | Força uso de HTTPS em acessos futuros (HSTS)                |
 
-### 4.6. O papel do *debugging proxy*
+### 4.6. O papel do Fiddler como *debugging proxy*
 
-Um *debugging proxy* (como Fiddler, mitmproxy, Burp, HTTP Toolkit) é um **man-in-the-middle controlado** que o próprio usuário instala:
+O Fiddler Classic é um *debugging proxy*: um **man-in-the-middle controlado** que o próprio usuário instala para observar o tráfego do navegador:
 
 ```
 [Navegador]  ──►  [Proxy local na porta 8888]  ──►  [Internet]  ──►  [Servidor]
