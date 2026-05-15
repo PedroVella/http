@@ -12,22 +12,23 @@
 
 | Campo                                       | Valor                                         |
 |---------------------------------------------|-----------------------------------------------|
-| Nome                                        | [seu nome completo]                           |
-| RA                                          | [seu RA]                                      |
+| Nome                                        | Pedro Azevedo Vella                           |
+| RA                                          | 0050482411009                                 |
 | Disciplina                                  | Redes de Computadores                         |
-| Turma                                       | [sua turma]                                   |
-| Data                                        | [data da realização]                          |
+| Turma                                       | Noturno                                       |
+| Data                                        | 09/05/2026                                    |
 | Fluxo                                       | **B — Aluno sem privilégio de administrador** |
-| SO utilizado                                | [Windows 10/11]                               |
+| SO utilizado                                | [Windows 11]                                  |
 | Ferramenta de proxy                         | Fiddler Classic per-user                      |
-| Navegador(es)                               | [Chrome 124 / Firefox 125 / ...]              |
-| HTTPS-First Mode / HTTPS-Only desabilitado? | [sim / não]                                   |
+| Navegador(es)                               | Chrome 124                                    |
+| HTTPS-First Mode / HTTPS-Only desabilitado? | sim                                           |
 
 ---
 
 ## Atividade 1 — Primeira captura (`http://example.com`)
 
-**Captura de tela:** `evidencias/atv1_sessao.png`
+**Captura de tela:** <img width="1235" height="774" alt="atv1_sessao" src="https://github.com/user-attachments/assets/8d83b80b-424a-47b3-b54c-4554583d3bb7" />
+
 
 **Request-line enviada:**
 
