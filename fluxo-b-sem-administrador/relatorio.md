@@ -33,70 +33,76 @@
 **Request-line enviada:**
 
 ```http
-[colar aqui a linha inicial do request, ex: GET / HTTP/1.1]
+GET http://example.com/ HTTP/1.1
 ```
 
 **Status-line recebida:**
 
 ```http
-[colar aqui, ex: HTTP/1.1 200 OK]
+HTTP/1.1 200 OK
 ```
 
 ### Pergunta 1.1
 > Quantos cabeçalhos o navegador enviou no request? Liste-os.
 
 **Resposta:**
-[número total]
+7
 
 Cabeçalhos:
-- [cabeçalho 1]
-- [cabeçalho 2]
-- ...
+- Host: example.com
+- Connection: keep-alive
+- Upgrade-Insecure-Requests: 1
+- User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36
+- Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,/;q=0.8,application/signed-exchange;v=b3;q=0.7
+- Accept-Encoding: gzip, deflate
+- Accept-Language: pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7
 
 ### Pergunta 1.2
 > Qual foi o `Content-Length` da resposta? Se ele não apareceu, registre `Transfer-Encoding`, versão do protocolo ou outro indício observado. O corpo retornado é HTML, texto puro, JSON ou binário? Como você descobriu?
 
-**Resposta:** [...]
+**Resposta:** Transfer-Encoding: chunked
 
 ---
 
 ## Atividade 2 — Anatomia de um GET (`http://httpbin.org/get?...`)
 
-**Captura de tela:** `evidencias/atv2_raw.png`
+**Captura de tela:** <img width="1009" height="475" alt="atv2_raw" src="https://github.com/user-attachments/assets/eda02fc6-b04b-45e2-9925-89e14016602a" />
 
 **Request-line completa:**
 
 ```http
-[colar aqui]
+GET http://httpbin.org/get?... HTTP/1.1
 ```
 
 **Cabeçalhos-chave capturados:**
 
 | Cabeçalho    | Valor                    |
 |--------------|--------------------------|
-| `Host`       | [...]                    |
-| `User-Agent` | [...]                    |
-| `Accept`     | [...]                    |
+| `Host`       | httpbin.org              |
+| `User-Agent` | Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36                    |
+| `Accept`     | text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,/;q=0.8,application/signed-exchange;v=b3;q=0.7                   |
 
 **Campos do JSON de resposta:**
 
 ```json
 {
-  "args":    [colar valor],
-  "headers": [colar valor resumido],
-  "origin":  [colar valor]
+  "args":
+    "aluno": "PEDRO_VELLA", 
+    "curso": "redes"
+  "headers": [Accept=text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7]
+  "origin":  [187.58.19.46]
 }
 ```
 
 ### Pergunta 2.1
 > O valor do campo `origin` corresponde a qual elemento da rede? Por que normalmente não é o IP local?
 
-**Resposta:** [...]
+**Resposta:**  Ao IP público visto pelo servidor. Normalmente não é o IP local por conta de quem entra em contato com a internet ser o roteador.
 
 ### Pergunta 2.2
 > Compare o `User-Agent` enviado com o que aparece no JSON da resposta. Coincidem?
 
-**Resposta:** [...]
+**Resposta:** Sim
 
 ### Pergunta 2.3
 > Em `http://httpbin.org/headers`, liste até três cabeçalhos que o servidor vê mas **não aparecem** no Raw do request. De onde vêm? Se não encontrar três, explique por que o resultado pode variar.
@@ -105,98 +111,122 @@ Cabeçalhos:
 
 | Cabeçalho visto pelo servidor | Origem provável | Observação |
 |-------------------------------|-----------------|------------|
-| [...]                         | [...]           | [...]      |
-| [...]                         | [...]           | [...]      |
-| [...]                         | [...]           | [...]      |
+| host                          | Servidor        | [...]      |
+| X-Amzn-Trace-Id               | Servidor        | [...]      |
+| Upgrade-Insecure-Requests     | Servidor        | [...]      |
 
 ---
 
 ## Atividade 3 — POST e envio de formulário (`http://httpbin.org/forms/post` → `/post`)
 
-**Captura de tela:** `evidencias/atv3_post_raw.png`
+**Captura de tela:** <img width="1010" height="523" alt="atv3_post_raw" src="https://github.com/user-attachments/assets/49100217-c36a-466e-aea8-0127ac0860b5" />
+
 
 **Request-line do POST:**
 
 ```http
-[colar aqui]
+POST http://httpbin.org/post HTTP/1.1
 ```
 
 **Cabeçalhos do request:**
 
 | Cabeçalho        | Valor |
 |------------------|-------|
-| `Content-Type`   | [...] |
-| `Content-Length` | [...] |
+| `Content-Type`   | application/json |
+| `Content-Length` | 1189 |
 
 **Corpo completo do request:**
 
-```
-[colar aqui o body enviado]
+```custname=Pedro&custtel=13+99999+9999&custemail=vellaaurudo%40gmail.com&size=large&topping=bacon&topping=cheese&topping=mushroom&delivery=12%3A45&comments=vem+rapido
 ```
 
 **Trecho do JSON de resposta (campo `form`):**
 
 ```json
 "form": {
-  [colar aqui]
+    "comments": "vem rapido", 
+    "custemail": "vellaaurudo@gmail.com", 
+    "custname": "Pedro", 
+    "custtel": "13 99999 9999", 
+    "delivery": "17:33", 
+    "size": "large", 
+    "topping": [
+      "bacon", 
+      "cheese", 
+      "mushroom"
+    ]
 }
 ```
 
 ### Pergunta 3.1
 > Qual o formato do corpo? Como esse formato codifica caracteres especiais (espaço, acentos)?
 
-**Resposta:** [...]
+**Resposta:** application/x-www-form-urlencoded, caracteres fora do ASCII são convertidos para bytes UTF-8 e depois codificados em hexadecimal com %.
 
 ### Pergunta 3.2
 > Comparando **Request → WebForms** e **Request → Raw**: qual das duas corresponde literalmente aos bytes enviados no socket TCP?
 
-**Resposta:** [...]
+**Resposta:** RAW
 
 ### Pergunta 3.3 — Composer
 > Envie manualmente via Composer um `POST` para `http://httpbin.org/post` com JSON. Registre a resposta. Qual campo do JSON confirma que o servidor interpretou o JSON?
 
-**Captura de tela:** `evidencias/atv3_composer.png`
+**Captura de tela:** <img width="1010" height="523" alt="atv3_post_raw" src="https://github.com/user-attachments/assets/f22138fe-c001-4ce4-8d99-130d4428c098" />
+
 
 **Response JSON (trecho relevante):**
 
 ```json
 {
-  [colar aqui]
+  "args": {}, 
+  "data": "", 
+  "files": {}, 
+  "form": {}, 
+  "headers": {
+    "Content-Length": "0", 
+    "Host": "httpbin.org", 
+    "User-Agent": "Fiddler", 
+    "X-Amzn-Trace-Id": "Root=1-69ff3f5b-2d2a075d3cbb0a7d397fcd5f"
+  }, 
+  "json": null, 
+  "origin": "187.58.19.47", 
+  "url": "http://httpbin.org/post"
 }
 ```
 
-**Resposta:** [...]
+**Resposta:** no content-type ele afirma ser um json
 
 ---
 
 ## Atividade 4 — Catálogo de status codes (`http://httpbin.org/...`)
 
-**Captura de tela (lista do Fiddler com as 7 sessões):** `evidencias/atv4_lista.png`
+**Captura de tela (lista do Fiddler com as 7 sessões):** <img width="563" height="351" alt="atv4_lista" src="https://github.com/user-attachments/assets/f29f134f-fe8f-471b-864c-1e47b4eebbfe" />
+
 
 | # | Método | URL | Status-line | `Content-Length` / `Transfer-Encoding` | Body presente? |
 |---|--------|-----|-------------|-----------------------------------------|----------------|
-| 1 | GET    | `http://httpbin.org/status/200` | [...] | [...] | [sim/não] |
-| 2 | GET    | `http://httpbin.org/redirect-to?status_code=301&url=/get` | [...] | [...] | [sim/não] |
-| 3 | GET    | `http://httpbin.org/status/404` | [...] | [...] | [sim/não] |
-| 4 | GET    | `http://httpbin.org/status/418` | [...] | [...] | [sim/não] |
-| 5 | GET    | `http://httpbin.org/status/500` | [...] | [...] | [sim/não] |
-| 6 | GET    | `http://httpbin.org/status/503` | [...] | [...] | [sim/não] |
-| 7 | GET    | `http://httpbin.org/cache` com `If-Modified-Since` | [...] | [...] | [sim/não] |
+| 1 | GET    | `http://httpbin.org/status/200` | 200 | 0 | não |
+| 2 | GET    | `http://httpbin.org/redirect-to?status_code=301&url=/get` | 301 | 0 | não |
+| 3 | GET    | `http://httpbin.org/status/404` | 404 | 0 | não |
+| 4 | GET    | `http://httpbin.org/status/418` | 418 | 138 | sim |
+| 5 | GET    | `http://httpbin.org/status/500` | 500 | 0 | não |
+| 6 | GET    | `http://httpbin.org/status/503` | 503 | 0 | não |
+| 7 | GET    | `http://httpbin.org/cache` com `If-Modified-Since` | Gzip. | 630 | não |
 
 ### Pergunta 4.1
 > Em qual dos status o corpo está ausente/tamanho zero? Isso é obrigatório pela especificação ou depende do servidor?
 
-**Resposta:** [...]
+**Resposta:** 200, 301, 500, 503 e 304. depende do servidor
 
 ### Pergunta 4.2
 > No `301`, qual cabeçalho da resposta informa para onde ir? O que aconteceria se estivesse ausente?
 
-**Resposta:** [...]
+**Resposta:** o cabeçalho informa o destino do redirecionamento sem ele o navegador nao saberia para onde redirecionar o user
 
 ### Pergunta 4.3
 > Diferença semântica entre `200`, `304` e `404` do ponto de vista do cache do navegador.
 
-**Resposta:** [...]
+**Resposta:** Não sei responder essa
 
 ---
 
